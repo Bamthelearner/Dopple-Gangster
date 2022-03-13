@@ -1,5 +1,6 @@
 import MetadataViews from "./MetadataViews.cdc"
 
+
 pub contract DoppleGangsterComponentTemplate {
 
     pub event ContractInitialized()
@@ -42,10 +43,10 @@ pub contract DoppleGangsterComponentTemplate {
         pub let name : String
         pub let description : String?
 
-        pub var compulsoryCategories : {String : [UInt64]}
-        pub var optionalCategories :  {String : [UInt64]}
+        access(contract) var compulsoryCategories : {String : [UInt64]}
+        access(contract) var optionalCategories :  {String : [UInt64]}
 
-        pub var displaySequence : [String]
+        access(contract) var displaySequence : [String]
 
         init(   series:UInt32, 
                 name: String, 
@@ -170,8 +171,8 @@ pub contract DoppleGangsterComponentTemplate {
         }
         /* MetadataViews Implementation */ 
         pub fun getViews(): [Type]{
-        return [Type<MetadataViews.Display>(), 
-                Type<DoppleGangsterComponentTemplate.TemplateMetadata>()]
+            return [Type<MetadataViews.Display>(), 
+                    Type<DoppleGangsterComponentTemplate.TemplateMetadata>()]
         }
         pub fun resolveView(_ view: Type): AnyStruct? {
             switch view {
@@ -231,37 +232,33 @@ pub contract DoppleGangsterComponentTemplate {
         return self.totalSeries[series]
     }
 
-    // true : return compulsory components in display sequence
-    // false : return optional components in display sequence
-    // nil : return all components in display sequence
-    pub fun getCategoriesInSequence(series: UInt32, compulsory: Bool?) : [String] {
+    pub fun getCategoriesInSequence(series: UInt32) : [String] {
         pre{
             self.totalSeries[series] != nil : "This series does not exist"
         }
         let seriesData = self.totalSeries[series]!
         var sequence : [String] = seriesData.displaySequence
         var index : UInt64 = 0
-        switch compulsory {
-            case true :
-                for category in seriesData.displaySequence{
-                    if !seriesData.compulsoryCategories.keys.contains(category){
-                        sequence.remove(at: index)
-                    }
-                    index = index + 1
-                }
-                return sequence
+        return sequence
+    }
 
-            case false:
-                for category in seriesData.displaySequence{
-                    if !seriesData.optionalCategories.keys.contains(category){
-                        sequence.remove(at: index)
-                    }
-                    index = index + 1
-                }
-                return sequence
-        
+    pub fun getCompulsoryCategories(series: UInt32) : [String] {
+        pre{
+            self.totalSeries[series] != nil : "This series does not exist"
         }
+        let seriesData = self.totalSeries[series]!
+        var sequence : [String] = seriesData.compulsoryCategories.keys
+        var index : UInt64 = 0
+        return sequence
+    }
 
+    pub fun getOptionalCategories(series: UInt32) : [String] {
+        pre{
+            self.totalSeries[series] != nil : "This series does not exist"
+        }
+        let seriesData = self.totalSeries[series]!
+        var sequence : [String] = seriesData.optionalCategories.keys
+        var index : UInt64 = 0
         return sequence
     }
 
@@ -400,11 +397,10 @@ pub contract DoppleGangsterComponentTemplate {
 
     }
 
-    access(contract) fun createTemplate(name : String ,
+    access(account) fun createTemplate(name : String ,
                                         description : String? ,
                                         series : UInt32 ,
                                         category : String ,
-                                        compulsory : Bool ,
                                         color : String ,
                                         svg : String ,
                                         rarity : String ,
@@ -423,27 +419,44 @@ pub contract DoppleGangsterComponentTemplate {
 
         /* Check if the category exist in this series */
         let seriesData = self.totalSeries[series]!
-        switch compulsory{
-            case true:
-                assert(seriesData.compulsoryCategories[category] != nil, message : "This category does not exist as compulsory category")
-
-            case false:
-                assert(seriesData.optionalCategories[category] != nil, message : "This category does not exist as compulsory category")
+        var compulsory : Bool? = nil
+        assert(seriesData.displaySequence.contains(category), message : "This category does not exist in this series")
+        if seriesData.compulsoryCategories.keys.contains(category) {
+            compulsory = true
         }
+        if seriesData.optionalCategories.keys.contains(category) {
+            compulsory = false
+        }
+        
 
         let templateResource <- create Template(name : name ,
                                                 description : description ,
                                                 series : series ,
                                                 category : category ,
-                                                compulsory : compulsory ,
+                                                compulsory : compulsory! ,
                                                 color : color ,
                                                 svg : svg ,
                                                 rarity : rarity ,
                                                 maxMintable : maxMintable)
 
+        self.totalMintedComponents[templateResource.id] = 0
+
         self.deposit(token: <- templateResource)
+    }
 
+    pub fun getTotalMintedComponents(id: UInt64) : UInt64? {
+        return self.totalMintedComponents[id]
+    }
 
+    pub fun getComponentMaxMintable(id: UInt64) : UInt64? {
+        let templateMetadata = self.borrowDoppleGangsterTemplate(id: id).template
+        return templateMetadata.maxMintable
+    }
 
+    access(contract) fun setTotalMintedComponents(id: UInt64) {
+        pre{
+            self.totalMintedComponents[id]  != nil : "This component does not exist" 
+        }
+        self.totalMintedComponents[id] = self.totalMintedComponents[id]! + 1
     }
 }

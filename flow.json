@@ -5,7 +5,61 @@
 			"serviceAccount": "emulator-account"
 		}
 	},
-	"contracts": {},
+	"contracts": {
+		"FlowToken": {
+			"source": "./contracts/FlowToken.cdc",
+			"aliases": {
+			  "testnet": "0x7e60df042a9c0868",
+			  "mainnet": "0x1654653399040a61"
+			}
+	  	},
+		"FungibleToken": {
+			"source": "./contracts/FungibleToken.cdc",
+			"aliases": {
+			  "emulator": "0xee82856bf20e2aa6",
+			  "testnet": "0x9a0766d93b6608b7",
+			  "mainnet": "0xf233dcee88fe0abe"
+			}
+		},
+		"NonFungibleToken": {
+			"source": "./contracts/NonFungibleToken.cdc",
+			"aliases": {
+			  "testnet": "0x631e88ae7f1d7c20",
+			  "mainnet": "0x1d7e57aa55817448"
+			}
+		},
+		"MetadataViews": {
+			"source": "./contracts/MetadataViews.cdc",
+			"aliases": {
+			  "testnet": "0x631e88ae7f1d7c20",
+			  "mainnet": "0x1d7e57aa55817448"
+			}
+		},
+		"DoppleGangsterComponentTemplate" : {
+			"source": "./contracts/DoppleGangsterComponentTemplate.cdc",
+			"aliases": {
+			  "testnet": "0x9d7afa6fc07f6347"
+			}
+		},
+		"DoppleGangsterComponent" : {
+			"source": "./contracts/DoppleGangsterComponent.cdc",
+			"aliases": {
+			  "testnet": "0x9d7afa6fc07f6347"
+			}
+		},
+		"DoppleGangster" : {
+			"source": "./contracts/DoppleGangster.cdc",
+			"aliases": {
+			  "testnet": "0x9d7afa6fc07f6347"
+			}
+		},
+		"DoppleGangsterAdmin" : {
+			"source": "./contracts/DoppleGangsterAdmin.cdc",
+			"aliases": {
+			  "testnet": "0x9d7afa6fc07f6347"
+			}
+		}
+	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
 		"mainnet": "access.mainnet.nodes.onflow.org:9000",
@@ -15,7 +69,27 @@
 		"emulator-account": {
 			"address": "f8d6e0586b0a20c7",
 			"key": "9094e074a0f2ea8d5c2067baeaa82e9854d640889099c4fc4cf00e22c518e7ed"
-		}
+		} ,
+		"testnet-account" : {
+			"address": "9d7afa6fc07f6347",
+			"key": {
+				"type" : "hex",
+				"index" : 0,
+				"signatureAlgorithm" : "ECDSA_secp256k1",
+				"hashAlgorithm" : "SHA3_256",
+				"privateKey" : "f76ef92a8790672106f967551248402c9c471d9b41b81521d4c2fadcfd9fd533",
+				"publicKey" : "66e0c49ff3b15a3aec6b78264a4827fa75835e00cbc50973a2979f43aa6a85ffa291c7c51e5fc58531af48717a4720768e675231677c4225516c9f814a69715b715b"
+			}
+		} 
 	},
-	"deployments": {}
+	"deployments": {
+		"testnet" : {
+			"testnet-account" :[
+				"DoppleGangsterComponentTemplate",
+				"DoppleGangsterComponent",
+				"DoppleGangster",
+				"DoppleGangsterAdmin"
+			]
+		}
+	}
 }
