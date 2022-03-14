@@ -119,7 +119,7 @@ pub contract DoppleGangster: NonFungibleToken{
     pub let name : String
     pub let series : UInt32
     pub let creatorAddress : Address
-    pub let royalties : [Royalty]
+    access(contract) let royalties : [Royalty]
 
 
     pub fun getDoppleGangsterSvg() : String
@@ -137,7 +137,7 @@ pub contract DoppleGangster: NonFungibleToken{
     access(contract) var compulsoryComponents : @{String : DoppleGangsterComponent.NFT} 
     access(contract) var optionalComponents : @{String : DoppleGangsterComponent.NFT}
 
-    pub let royalties : [Royalty]
+    access(contract) let royalties : [Royalty]
 
     init(creatorAddress: Address, series: UInt32, compulsoryComponents : @{String : DoppleGangsterComponent.NFT}, royalties: [Royalty]) {
       
@@ -221,6 +221,7 @@ pub contract DoppleGangster: NonFungibleToken{
     pub fun changeCompulsoryComponent(component: @DoppleGangsterComponent.NFT) : @DoppleGangsterComponent.NFT {
       pre{
         self.series == component.componentMetadata.series : "The component series does not match"
+        DoppleGangsterComponentTemplate.getCompulsoryCategories(series: self.series).contains(component.componentMetadata.category) : "The component is not a compulsory component"
       }
 
       let catInComponent = component.componentMetadata.category
@@ -238,6 +239,7 @@ pub contract DoppleGangster: NonFungibleToken{
     pub fun addOptionalComponent(component: @DoppleGangsterComponent.NFT) {
       pre{
         self.series == component.componentMetadata.series : "The component series does not match"
+        DoppleGangsterComponentTemplate.getOptionalCategories(series: self.series).contains(component.componentMetadata.category) : "The component is not an optional component"
       }
 
       let catInComponent = component.componentMetadata.category
@@ -252,6 +254,7 @@ pub contract DoppleGangster: NonFungibleToken{
     pub fun changeOptionalComponent(component: @DoppleGangsterComponent.NFT) : @DoppleGangsterComponent.NFT {
       pre{
         self.series == component.componentMetadata.series : "The component series does not match"
+        DoppleGangsterComponentTemplate.getOptionalCategories(series: self.series).contains(component.componentMetadata.category) : "The component is not an optional component"
       }
 
       let catInComponent = component.componentMetadata.category
@@ -524,7 +527,7 @@ pub contract DoppleGangster: NonFungibleToken{
     self.royaltyCut = 0.01
     self.marketplaceCut = 0.05
 
-    //self.account.save<@DoppleGangster.Collection>(<- DoppleGangster.createEmptyCollection(), to: DoppleGangster.CollectionStoragePath)
+    self.account.save<@DoppleGangster.Collection>(<- DoppleGangster.createEmptyCollection(), to: DoppleGangster.CollectionStoragePath)
     self.account.link<&{DoppleGangster.CollectionPublic}>(DoppleGangster.CollectionPublicPath, target: DoppleGangster.CollectionStoragePath)
 
     emit ContractInitialized()

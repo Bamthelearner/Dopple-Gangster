@@ -94,6 +94,22 @@ pub contract DoppleGangsterComponentTemplate {
             }
         }
 
+        access(contract) fun addCompulsoryComponentTemplate(category: String, id: UInt64) {
+            pre{
+                self.compulsoryCategories[category] != nil : "The category does not exist"
+            }
+            
+            self.compulsoryCategories[category]!.append(id)
+        }
+
+        access(contract) fun addOptionalComponentTemplate(category: String, id: UInt64) {
+            pre{
+                self.optionalCategories[category] != nil : "The category does not exist"
+            }
+            
+            self.optionalCategories[category]!.append(id)
+        }
+
     }
 
     // Declare svg thumbnail type for MetadataViews
@@ -413,8 +429,8 @@ pub contract DoppleGangsterComponentTemplate {
         /* Check if the name and svg exist in this series */
         for id in self.getComponentsBySeries(series: series){
             let templateRef = DoppleGangsterComponentTemplate.borrowDoppleGangsterTemplate(id: id)
-            assert(templateRef.template.name == name, message : "This name is already taken in this series by other component")
-            assert(templateRef.template.svg == svg, message : "This svg is already used in this series by other component")
+            assert(templateRef.template.name != name, message : "This name is already taken in this series by other component")
+            assert(templateRef.template.svg != svg, message : "This svg is already used in this series by other component")
         }
 
         /* Check if the category exist in this series */
@@ -427,7 +443,6 @@ pub contract DoppleGangsterComponentTemplate {
         if seriesData.optionalCategories.keys.contains(category) {
             compulsory = false
         }
-        
 
         let templateResource <- create Template(name : name ,
                                                 description : description ,
@@ -441,6 +456,12 @@ pub contract DoppleGangsterComponentTemplate {
 
         self.totalMintedComponents[templateResource.id] = 0
 
+        if compulsory! {
+           self.totalSeries[series]!.addCompulsoryComponentTemplate(category: category, id: templateResource.id)
+        } else if !compulsory!{
+           self.totalSeries[series]!.addOptionalComponentTemplate(category: category, id: templateResource.id)
+        }
+
         self.deposit(token: <- templateResource)
     }
 
@@ -453,7 +474,7 @@ pub contract DoppleGangsterComponentTemplate {
         return templateMetadata.maxMintable
     }
 
-    access(contract) fun setTotalMintedComponents(id: UInt64) {
+    access(account) fun setTotalMintedComponents(id: UInt64) {
         pre{
             self.totalMintedComponents[id]  != nil : "This component does not exist" 
         }

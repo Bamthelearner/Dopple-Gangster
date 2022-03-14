@@ -137,8 +137,12 @@ pub contract DoppleGangsterAdmin {
         self.AdminStoragePath = /storage/DoppleGangsterAdmin
         self.AdminPublicPath = /public/DoppleGangsterAdmin
 
-        //self.account.save<@DoppleGangsterAdmin.AdminFunction>(<- create AdminFunction(), to: DoppleGangsterAdmin.AdminFunctionStoragePath)
+        self.account.save<@DoppleGangsterAdmin.AdminFunction>(<- create AdminFunction(), to: DoppleGangsterAdmin.AdminFunctionStoragePath)
         self.account.link<&{DoppleGangsterAdmin.AdminFunctionPrivate}>(DoppleGangsterAdmin.AdminFunctionPrivatePath, target: DoppleGangsterAdmin.AdminFunctionStoragePath)
+
+        self.account.save<@DoppleGangsterAdmin.Admin>(<- create Admin(), to: DoppleGangsterAdmin.AdminStoragePath)
+        self.account.link<&{DoppleGangsterAdmin.AdminPublic}>(DoppleGangsterAdmin.AdminPublicPath, target: DoppleGangsterAdmin.AdminStoragePath)
+
 
     }
 

@@ -239,6 +239,8 @@ pub contract DoppleGangsterComponent : NonFungibleToken {
     assert(thisMint <= maxMintable, message: "The component exceed its allowed number of mintings.")
 
     var newNFT <- create NFT(templateId: templateId, mint : thisMint)
+
+    DoppleGangsterComponentTemplate.setTotalMintedComponents(id: templateId)
     
     emit Created(id: newNFT.id, templateId: templateId)
     
@@ -265,7 +267,7 @@ pub contract DoppleGangsterComponent : NonFungibleToken {
 
     self.nftHolder = {}
 
-    //self.account.save<@DoppleGangsterComponent.Collection>(<- DoppleGangsterComponent.createEmptyCollection(), to: DoppleGangsterComponent.CollectionStoragePath)
+    self.account.save<@DoppleGangsterComponent.Collection>(<- DoppleGangsterComponent.createEmptyCollection(), to: DoppleGangsterComponent.CollectionStoragePath)
     self.account.link<&{DoppleGangsterComponent.CollectionPublic}>(DoppleGangsterComponent.CollectionPublicPath, target: DoppleGangsterComponent.CollectionStoragePath)
 
     emit ContractInitialized()

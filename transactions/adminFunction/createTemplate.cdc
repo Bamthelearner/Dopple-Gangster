@@ -48,6 +48,6 @@ transaction {
                                          color : "blue" ,
                                          svg : "b1svg" ,
                                          rarity : "common" ,
-                                         maxMintable : 5)  
+                                         maxMintable : 15)  
   }
 }
