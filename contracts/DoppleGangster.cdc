@@ -528,7 +528,7 @@ pub contract DoppleGangster: NonFungibleToken{
     self.marketplaceCut = 0.05
 
     self.account.save<@DoppleGangster.Collection>(<- DoppleGangster.createEmptyCollection(), to: DoppleGangster.CollectionStoragePath)
-    self.account.link<&{DoppleGangster.CollectionPublic}>(DoppleGangster.CollectionPublicPath, target: DoppleGangster.CollectionStoragePath)
+    self.account.link<&{DoppleGangster.CollectionPublic, MetadataViews.ResolverCollection}>(DoppleGangster.CollectionPublicPath, target: DoppleGangster.CollectionStoragePath)
 
     emit ContractInitialized()
   }

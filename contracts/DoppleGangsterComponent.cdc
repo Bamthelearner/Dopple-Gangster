@@ -268,7 +268,7 @@ pub contract DoppleGangsterComponent : NonFungibleToken {
     self.nftHolder = {}
 
     self.account.save<@DoppleGangsterComponent.Collection>(<- DoppleGangsterComponent.createEmptyCollection(), to: DoppleGangsterComponent.CollectionStoragePath)
-    self.account.link<&{DoppleGangsterComponent.CollectionPublic}>(DoppleGangsterComponent.CollectionPublicPath, target: DoppleGangsterComponent.CollectionStoragePath)
+    self.account.link<&{DoppleGangsterComponent.CollectionPublic, MetadataViews.ResolverCollection}>(DoppleGangsterComponent.CollectionPublicPath, target: DoppleGangsterComponent.CollectionStoragePath)
 
     emit ContractInitialized()
   }

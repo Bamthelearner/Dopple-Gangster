@@ -10,11 +10,11 @@ transaction (id: UInt64, componentID: UInt64) {
   prepare(acct: AuthAccount) {
     if acct.borrow<&DoppleGangsterComponent.Collection>(from: DoppleGangsterComponent.CollectionStoragePath) == nil {
       acct.save<@DoppleGangsterComponent.Collection>(<- DoppleGangsterComponent.createEmptyCollection(), to: DoppleGangsterComponent.CollectionStoragePath)
-      acct.link<&{DoppleGangsterComponent.CollectionPublic}>(DoppleGangsterComponent.CollectionPublicPath, target: DoppleGangsterComponent.CollectionStoragePath)
+      acct.link<&{DoppleGangsterComponent.CollectionPublic, MetadataViews.ResolverCollection}>(DoppleGangsterComponent.CollectionPublicPath, target: DoppleGangsterComponent.CollectionStoragePath)
     }
     if acct.borrow<&DoppleGangster.Collection>(from: DoppleGangster.CollectionStoragePath) == nil {
       acct.save<@DoppleGangster.Collection>(<- DoppleGangster.createEmptyCollection(), to: DoppleGangster.CollectionStoragePath)
-      acct.link<&{DoppleGangster.CollectionPublic}>(DoppleGangster.CollectionPublicPath, target: DoppleGangster.CollectionStoragePath)
+      acct.link<&{DoppleGangster.CollectionPublic, MetadataViews.ResolverCollection}>(DoppleGangster.CollectionPublicPath, target: DoppleGangster.CollectionStoragePath)
     }
 
     self.collectionRef = acct.borrow<&DoppleGangster.Collection>(from: DoppleGangster.CollectionStoragePath) ?? panic("You do not have the admin right")
